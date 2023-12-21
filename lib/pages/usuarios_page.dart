@@ -1,12 +1,11 @@
-
+import 'package:chat_app/services/services.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'package:chat_app/models/models.dart';
 
 class UsuariosPage extends StatefulWidget {
-  
-
   const UsuariosPage({super.key});
 
   @override
@@ -14,29 +13,39 @@ class UsuariosPage extends StatefulWidget {
 }
 
 class _UsuariosPageState extends State<UsuariosPage> {
-
-  RefreshController _refreshController = RefreshController(initialRefresh: false);
-      
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
 
   final usuarios = [
-    Usuario(online: true, email: "wiltec32@gmail.com", nombre: "Wilmer Sanchez", uid: "1"),
+    Usuario(
+        online: true,
+        email: "wiltec32@gmail.com",
+        nombre: "Wilmer Sanchez",
+        uid: "1"),
     Usuario(online: false, email: "test1@test.com", nombre: "Mercy", uid: "2"),
-    Usuario(online: true, email: "test2@test.com", nombre: "Pedro Jss", uid: "3"),
+    Usuario(
+        online: true, email: "test2@test.com", nombre: "Pedro Jss", uid: "3"),
     Usuario(online: false, email: "test3@test.com", nombre: "Juanaa", uid: "4"),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+    final usuario = authService.usuario;
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Mi nombre",
-          style: TextStyle(color: Colors.black87),
+        title: Text(
+          usuario.nombre,
+          style: const TextStyle(color: Colors.black87),
         ),
         elevation: 1,
         backgroundColor: Colors.white,
         leading: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              // TODO: Desconectar del socket server
+              AuthService.deleteToken();
+              Navigator.pushReplacementNamed(context, "login");
+            },
             icon: const Icon(
               Icons.exit_to_app,
               color: Colors.black87,
@@ -56,7 +65,10 @@ class _UsuariosPageState extends State<UsuariosPage> {
         enablePullDown: true,
         onRefresh: _cargarUsuarios,
         header: WaterDropHeader(
-          complete: Icon(Icons.check, color: Colors.blue[400],),
+          complete: Icon(
+            Icons.check,
+            color: Colors.blue[400],
+          ),
           waterDropColor: Colors.blue,
         ),
         child: _listViewUsuarios(),
@@ -73,21 +85,20 @@ class _UsuariosPageState extends State<UsuariosPage> {
 
   ListTile _usuarioListTile(Usuario usuario) {
     return ListTile(
-          title: Text(usuario.nombre),
-          subtitle: Text(usuario.email),
-          leading: CircleAvatar(
-            backgroundColor: Colors.blue[100],
-            child: Text(usuario.nombre.substring(0,2)),
-          ),
-          trailing: Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(
-              color: usuario.online ? Colors.green[300] : Colors.red,
-              borderRadius: BorderRadius.circular(100)
-            ),
-          ),
-        );
+      title: Text(usuario.nombre),
+      subtitle: Text(usuario.email),
+      leading: CircleAvatar(
+        backgroundColor: Colors.blue[100],
+        child: Text(usuario.nombre.substring(0, 2)),
+      ),
+      trailing: Container(
+        width: 10,
+        height: 10,
+        decoration: BoxDecoration(
+            color: usuario.online ? Colors.green[300] : Colors.red,
+            borderRadius: BorderRadius.circular(100)),
+      ),
+    );
   }
 
   _cargarUsuarios() async {

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../helpers/helpers.dart';
+import '../services/services.dart';
 import '../widgets/widgets.dart';
 
 class LoginPage extends StatelessWidget {
@@ -17,7 +20,9 @@ class LoginPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Logo( titulo: "Messenger", ),
+                const Logo(
+                  titulo: "Messenger",
+                ),
                 _Form(),
                 const Labels(
                   ruta: "register",
@@ -41,7 +46,6 @@ class LoginPage extends StatelessWidget {
   }
 }
 
-
 class _Form extends StatefulWidget {
   @override
   State<_Form> createState() => __FormState();
@@ -53,6 +57,8 @@ class __FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -70,22 +76,27 @@ class __FormState extends State<_Form> {
             textController: passCtrl,
             isPassword: true,
           ),
-
           BotonAzul(
             texto: "Ingrese",
-            onPressed: () {
-              
-            },
+            onPressed: authService.autenticando
+                ? null
+                : () async {
+                    FocusScope.of(context).unfocus();
+                    final loginOK = await authService.login(
+                        emailCtrl.text.trim(), passCtrl.text.trim());
+                    if (loginOK) {
+                      // conectar nuestro socked server
+                      // Navegr a otra pantalla de inicio
+                      Navigator.pushReplacementNamed(context, "usuarios");
+                    } else {
+                      // Mostrar alerta
+                      mostrarAlerta(context, "Login Incorrecto",
+                          "Revise sus credenciales.");
+                    }
+                  },
           ),
         ],
       ),
     );
   }
 }
-
-
-
-
-
-
-

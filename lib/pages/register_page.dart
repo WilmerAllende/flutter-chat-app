@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../helpers/helpers.dart';
+import '../services/services.dart';
 import '../widgets/widgets.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -17,7 +20,9 @@ class RegisterPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Logo( titulo: "Register",),
+                const Logo(
+                  titulo: "Register",
+                ),
                 _Form(),
                 const Labels(
                   ruta: "login",
@@ -41,7 +46,6 @@ class RegisterPage extends StatelessWidget {
   }
 }
 
-
 class _Form extends StatefulWidget {
   @override
   State<_Form> createState() => __FormState();
@@ -54,6 +58,7 @@ class __FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -76,22 +81,28 @@ class __FormState extends State<_Form> {
             textController: passCtrl,
             isPassword: true,
           ),
-
           BotonAzul(
-            texto: "Ingrese",
-            onPressed: () {
-              
-            },
+            texto: "Registrar",
+            onPressed: authService.autenticando
+                ? null
+                : () async {
+                    FocusScope.of(context).unfocus();
+                    final registerOk = await authService.register(
+                        nameCtrl.text.trim(),
+                        emailCtrl.text.trim(),
+                        passCtrl.text.trim());
+                    if (registerOk == true) {
+                      // coenctar alsocket server
+
+                      Navigator.pushReplacementNamed(context, "usuarios");
+                    } else {
+                      // Mostrar alerta
+                      mostrarAlerta(context, "Registro Incorrecto", registerOk);
+                    }
+                  },
           ),
         ],
       ),
     );
   }
 }
-
-
-
-
-
-
-
