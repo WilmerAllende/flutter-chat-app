@@ -13,8 +13,10 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  MultiProvider(
-      providers: [
+      providers: [  
         ChangeNotifierProvider(create: (context) => AuthService(), ),
+        ChangeNotifierProvider(create: (context) => SocketService(), ),
+        ChangeNotifierProvider(create: (context) => ChatServiceNotifier(), ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

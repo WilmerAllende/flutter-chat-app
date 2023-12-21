@@ -23,24 +23,26 @@ class LoadingPage extends StatelessWidget {
   }
 
   Future checkLoginState(BuildContext context) async {
-    final authService = Provider.of<AuthService>(context);
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final socketService = Provider.of<SocketService>(context, listen: false);
     final autenticado = await authService.isLoggedIn();
     if (!autenticado) {
       Navigator.pushReplacement(
-          context, PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => const LoginPage(),
-            transitionDuration: const Duration(milliseconds: 0)
-            )
-          );
+          context,
+          PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const LoginPage(),
+              transitionDuration: const Duration(milliseconds: 0)));
     } else {
       // Conectar al socket server
+      socketService.connect();
       //Navigator.pushReplacementNamed(context, "usuarios");
       Navigator.pushReplacement(
-          context, PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => const UsuariosPage(),
-            transitionDuration: const Duration(milliseconds: 0)
-            )
-          );
+          context,
+          PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const UsuariosPage(),
+              transitionDuration: const Duration(milliseconds: 0)));
     }
   }
 }
